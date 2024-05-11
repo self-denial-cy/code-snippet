@@ -1,11 +1,3 @@
-/*
- * @Author: Jerry
- * @Date: 2023-11-28 18:13:11
- * @LastEditors: Jerry
- * @LastEditTime: 2023-11-28 18:40:02
- * @Description: ES6 Reflect
- */
-
 /**
  * Reflect 设计目的
  * 1. 将 Object 上属于语言内部的方法，搬到 Reflect 上；现在，某些方法同时在 Object 和 Reflect 上，未来的新方法将只
@@ -18,28 +10,26 @@
  */
 
 // 01. receiver 参数
-(function () {
-  const obj = {
-    foo: 1,
-    bar: 2,
-    get baz() {
-      return this.foo + this.bar
-    },
-    set value(val) {
-      return (this.foo = val)
-    }
+const obj = {
+  foo: 1,
+  bar: 2,
+  get baz() {
+    return this.foo + this.bar
+  },
+  set value(val) {
+    return (this.foo = val)
   }
+}
 
-  console.log(Reflect.get(obj, 'baz'))
-  console.log(Reflect.get(obj, 'baz', {
-    foo: 10,
-    bar: 20
-  })) // 传入 receiver 改变 getter 内部 this 指向
+console.log(Reflect.get(obj, 'baz'))
+console.log(Reflect.get(obj, 'baz', {
+  foo: 10,
+  bar: 20
+})) // 传入 receiver 改变 getter 内部 this 指向
 
-  console.log(Reflect.set(obj, 'value', 100))
-  console.log(obj.foo)
-  console.log(Reflect.set(obj, 'value', 200, {
-    foo: 1
-  })) // 传入 receiver 改变 setter 内部 this 指向
-  console.log(obj.foo)
-})();
+console.log(Reflect.set(obj, 'value', 100))
+console.log(obj.foo)
+console.log(Reflect.set(obj, 'value', 200, {
+  foo: 1
+})) // 传入 receiver 改变 setter 内部 this 指向
+console.log(obj.foo)
