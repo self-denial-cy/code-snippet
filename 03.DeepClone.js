@@ -1,4 +1,13 @@
-// 深拷贝实现
+/**
+ * 深拷贝
+ * 1.原始类型数据拷贝
+ * 2.键和值都是原始类型的普通对象拷贝
+ * 3.Date 和 RegExp 对象拷贝
+ * 4.Map 和 Set 对象拷贝
+ * 5.普通对象的原型拷贝
+ * 6.循环引用
+ */
+
 function deepCopy(source) {
   const weakmap = new WeakMap()
 
@@ -9,15 +18,16 @@ function deepCopy(source) {
 
   // 判断是否是引用类型
   function isObject(val) {
-    return val !== null && (typeof val === 'object' || typeof val === 'function')
+    return (val !== null && typeof val === 'object') || typeof val === 'function'
   }
 
   function copy(input) {
-    // 如果是函数或者原始类型，直接返回
-    if (typeof input === 'function' || !isObject(input)) return input
+    // 如果是原始类型，直接返回
+    if (!isObject(input)) return input
 
-    // 针对循环引用处理下
-    if (weakmap.has(input)) return weakmap.get(input)
+    // 针对 Date 和 RegExp 类型处理下
+    if (input instanceof Date) return new Date(input)
+    if (input instanceof RegExp) return new RegExp(input)
 
     // 针对三大包装类型处理下
     if (Object.prototype.toString.call(input) === '[object String]') {
@@ -28,15 +38,36 @@ function deepCopy(source) {
       return Object(Boolean.prototype.valueOf.call(input))
     }
 
-    // 拷贝原型对象
-    const output = isArray(input) ? [] : Object.create(Object.getPrototypeOf(input))
+    // 针对循环引用处理下
+    if (weakmap.has(input)) return weakmap.get(input)
+
+    let output
+    if (isArray(input)) {
+      output = []
+    } else if (input instanceof Map) {
+      output = new Map()
+    } else if (input instanceof Set) {
+      output = new Set()
+    } else {
+      output = Object.create(Object.getPrototypeOf(input)) // 拷贝原型对象
+    }
 
     weakmap.set(input, output)
 
-    // for...in 遍历对象或数组本身及原型链上可遍历属性、hasOwnProperty 限制只遍历本身属性
-    for (const key in input) {
-      if (input.hasOwnProperty(key)) {
-        output[key] = copy(input[key])
+    if (input instanceof Map) {
+      input.forEach(function (val, key) {
+        output.set(copy(key), copy(val))
+      })
+    } else if (input instanceof Set) {
+      input.forEach(function (val) {
+        output.add(copy(val))
+      })
+    } else {
+      // for...in 遍历对象或数组本身及原型链上可遍历属性、hasOwnProperty 限制只遍历本身属性
+      for (const key in input) {
+        if (input.hasOwnProperty(key)) {
+          output[key] = copy(input[key])
+        }
       }
     }
 

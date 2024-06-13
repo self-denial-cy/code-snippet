@@ -1,9 +1,11 @@
-// 0 1 1 2 3 5 8，假设第 0 个是 0，第 1 个是 1，求第 n 个数的实现方式？
-
-function fn(n) {
-  if (n === 0) return 0
-  if (n === 1) return 1
-  return fn(n - 2) + fn(n - 1)
+// 斐波那契数列【用数组存值减少计算】
+function fibonacci(n) {
+  const fibArr = [0, 1]
+  if (n <= 1) return fibArr[n]
+  for (let i = 2; i <= n; i++) {
+    fibArr[i] = fibArr[i - 2] + fibArr[i - 1]
+  }
+  return fibArr[n]
 }
 
-console.log(fn(6))
+console.log(fibonacci(6))
